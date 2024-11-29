@@ -42,18 +42,18 @@ def current_weather(lat, lon):
     # response = requests.get(url, headers=headers)
     response = requests.get(url)
     data = response.json()
-
+    print()
     # Данная реализация приведена для тарифа «Тестовый», если у вас Тариф «Погода на вашем сайте», то закомментируйте пару строк указанных ниже
     result = {
         'city': data['location']['name'],  # Если используете Тариф «Погода на вашем сайте», то закомментируйте эту строку
-        'time': datetime.fromtimestamp(data[['current']]['last_updated']).strftime("%H:%M"),  # Если используете Тариф «Погода на вашем сайте», то закомментируйте эту строку
-        'temp': ['current']['temp_c'],  # TODO Реализовать вычисление температуры из данных полученных от API
-        'feels_like_temp': ['current']['feelslike_c'],  # TODO Реализовать вычисление ощущаемой температуры из данных полученных от API
-        'pressure': ['current']['pressure_mb'],  # TODO Реализовать вычисление давления из данных полученных от API
-        'humidity': ['current']['humidity'],  # TODO Реализовать вычисление влажности из данных полученных от API
-        'wind_speed': ['current']['wind_kph'],  # TODO Реализовать вычисление скорости ветра из данных полученных от API
-        'wind_gust': ['current']['gust_kph'],  # TODO Реализовать вычисление скорости порывов ветка из данных полученных от API
-        'wind_dir': DIRECTION_TRANSFORM.get(data['current']['wind_dir']),  # Если используете Тариф «Погода на вашем сайте», то закомментируйте эту строку
+        'time': data['current']['last_updated'],  # Если используете Тариф «Погода на вашем сайте», то закомментируйте эту строку
+        'temp': data['current']['temp_c'],  # TODO Реализовать вычисление температуры из данных полученных от API
+        'feels_like_temp': data['current']['feelslike_c'],  # TODO Реализовать вычисление ощущаемой температуры из данных полученных от API
+        'pressure': data['current']['pressure_mb'],  # TODO Реализовать вычисление давления из данных полученных от API
+        'humidity': data['current']['humidity'],  # TODO Реализовать вычисление влажности из данных полученных от API
+        'wind_speed': data['current']['wind_kph'],  # TODO Реализовать вычисление скорости ветра из данных полученных от API
+        'wind_gust': data['current']['gust_kph'],  # TODO Реализовать вычисление скорости порывов ветка из данных полученных от API
+        'wind_dir': data['current']['wind_dir'],  # Если используете Тариф «Погода на вашем сайте», то закомментируйте эту строку
     }
     return result
 
