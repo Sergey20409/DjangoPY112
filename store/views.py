@@ -1,14 +1,19 @@
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseNotFound
 from .models import DATABASE
 
 
 def products_view(request):
     if request.method == "GET":
+        data=request.GET
+        if data.get('id'):
 
-        return  JsonResponse(DATABASE, json_dumps_params={'ensure_ascii': False,
-                                                     'indent': 4})# Вернуть JsonResponse с объектом DATABASE и параметрами отступов и кодировок,
-        # как в приложении app_weather
+
+        return JsonResponse(DATABASE, json_dumps_params={'ensure_ascii': False,
+                                                     'indent': 4})
+
+
+
 # Create your views here.
 from django.http import HttpResponse
 
