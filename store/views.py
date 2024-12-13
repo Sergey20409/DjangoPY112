@@ -10,3 +10,10 @@ def products_view(request):
                                                      'indent': 4})# Вернуть JsonResponse с объектом DATABASE и параметрами отступов и кодировок,
         # как в приложении app_weather
 # Create your views here.
+from django.http import HttpResponse
+
+def shop_view(request):
+    if request.method == "GET":
+        with open('store/shop.html', encoding="utf-8") as f:
+            data = f.read()  # Читаем HTML файл
+        return HttpResponse(data)  # Отправляем HTML файл как ответ
