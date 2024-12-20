@@ -1,18 +1,32 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse, HttpResponseNotFound
 from .models import DATABASE
-
+from logic.services import filtering_category
 
 def products_view(request):
     if request.method == "GET":
-        data=request.GET
-        if data.get('id'):
+        id = request.GET.get("id")
+        if id:
+            for i, values in DATABASE.items():
+                if int(id) == values['id']:
+                    return JsonResponse(DATABASE(i), json_dumps_params={'ensure_ascii': False,
+                                                             'indent': 4})
+            return HttpResponseNotFound("Данного продукта нет в базе данных")
 
-
-        return JsonResponse(DATABASE, json_dumps_params={'ensure_ascii': False,
-                                                     'indent': 4})
-
-
+        category_key = request.GET.get("category")  # Считали 'category'
+        data = None
+        if ordering_key := request.GET.get("ordering"): # Если в параметрах есть 'ordering'
+            if request.GET.get("reverse").lower() == 'true': # Если в параметрах есть 'ordering' и 'reverse'=True
+                data = filtering_category(DATABASE, category_key, ordering_key, reverse= True) #  TODO Использовать filtering_category и провести фильтрацию с параметрами category, ordering, reverse=True
+            else:  # Если не обнаружили в адресно строке ...&reverse=true , значит reverse=False
+                data = filtering_category(DATABASE, category_key, ordering_key, reverse= False) #  TODO Использовать filtering_category и провести фильтрацию с параметрами category, ordering, reverse=False
+        else:
+            data = filtering_category(DATABASE, category_key) #  TODO Использовать filtering_category и провести фильтрацию с параметрами category
+        if data:
+            return JsonResponse(data, json_dumps_params={'ensure_ascii': False,
+                                                                 'indent': 4}, safe=False)# В этот раз добавляем параметр safe=False, для корректного отображения списка в JSON
+        return JsonResponse(data, safe=False, json_dumps_params={'ensure_ascii': False,
+                                                                 'indent': 4})
 
 # Create your views here.
 from django.http import HttpResponse
@@ -22,3 +36,38 @@ def shop_view(request):
         with open('store/shop.html', encoding="utf-8") as f:
             data = f.read()  # Читаем HTML файл
         return HttpResponse(data)  # Отправляем HTML файл как ответ
+
+def products_page_view(request, page):
+    if request.method == "GET":
+        for data in DATABASE.values():
+            if data['html'] == page:  # Если значение переданного параметра совпадает именем html файла
+                with open(f'store/products/{page}.html', encoding="utf-8") as f:
+                    data = f.read()
+                return HttpResponse(data)
+        # TODO 1. Откройте файл open(f'store/products/{page}.html', encoding="utf-8") (Не забываем про контекстный менеджер with)
+        # TODO 2. Прочитайте его содержимое
+        # TODO 3. Верните HttpResponse c содержимым html файла
+
+        # Если за всё время поиска не было совпадений, то значит по данному имени нет соответствующей
+        # страницы товара и можно вернуть ответ с ошибкой HttpResponse(status=404)
+        return HttpResponse(status=404)
+
+def products_page_view(request, page):
+    if request.method == "GET":
+        if isinstance(page, str):
+           # TODO Вставьте сюда тот код, что был ранее для обработки типа slug в products_page_view
+           with open(f'store/products/{page}.html', encoding="utf-8") as f:
+               data = f.read()
+           return HttpResponse(data)
+
+        elif isinstance(page, int):
+            data = DATABASE.get(str(page))  # Получаем какой странице соответствует данный id
+            if data:  # Если по данному page было найдено значение
+                with open(f'store/products/{data["html"]}.html', encoding="utf-8") as f:
+                    data = f.read()
+                return HttpResponse(data)
+                # TODO 1. Откройте файл open(f'store/products/{data["html"]}.html', encoding="utf-8") (Не забываем про контекстный менеджер with)
+                # TODO 2. Прочитайте его содержимое
+                # TODO 3. Верните HttpResponse c содержимым html файла
+
+        return HttpResponse(status=404)
