@@ -6,6 +6,7 @@ from .models import DATABASE
 def products_view(request):
     if request.method == "GET":
         ID = request.GET.get('id')
+
         if ID:
             if ID in DATABASE:
                 return JsonResponse(DATABASE[ID], json_dumps_params={'ensure_ascii': False,
