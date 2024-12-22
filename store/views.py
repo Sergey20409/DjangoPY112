@@ -15,7 +15,7 @@ def products_view(request):
         category_key = request.GET.get('category')
         data = None
         if ordering_key := request.GET.get("ordering"):  # Если в параметрах есть 'ordering'
-            if request.GET.get("reverse").lower() == 'true':
+            if request.GET.get("reverse") and request.GET.get('reverse').lower()  == 'true':
                 data = filtering_category(DATABASE, category_key, ordering_key, reverse=True)
             else:
                 data = filtering_category(DATABASE, category_key, ordering_key, reverse=False)
