@@ -1,21 +1,33 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse, HttpResponseNotFound
 from .models import DATABASE
-
+from logic.services import filtering_category
 
 def products_view(request):
     if request.method == "GET":
-        ID = request.GET.get('id')
-
-        if ID:
-            if ID in DATABASE:
-                return JsonResponse(DATABASE[ID], json_dumps_params={'ensure_ascii': False,
+        id = request.GET.get('id')
+        if id:
+            for i, values in DATABASE.items():
+                if int(id) == values ['id']:
+                    return JsonResponse(DATABASE[i], json_dumps_params={'ensure_ascii': False,
                                                                  'indent': 4})
+            return HttpResponseNotFound("Данного продукта нет в базе данных")
+        category_key = request.GET.get('category')
+        data = None
+        if ordering_key := request.GET.get("ordering"):  # Если в параметрах есть 'ordering'
+            if request.GET.get("reverse").lower() == 'true':
+                data = filtering_category(DATABASE, category_key, ordering_key, reverse=True)
             else:
-                return HttpResponseNotFound("Данного продукта нет в базе данных")
+                data = filtering_category(DATABASE, category_key, ordering_key, reverse=False)
         else:
-            return JsonResponse(DATABASE, json_dumps_params={'ensure_ascii': False,
-                                                             'indent': 4})
+            data = filtering_category(DATABASE, category_key)
+        if data:
+            return JsonResponse(data, json_dumps_params={'ensure_ascii': False,
+                                                                 'indent': 4}, safe=False)
+        return JsonResponse(data, json_dumps_params={'ensure_ascii': False,
+                                                     'indent': 4})
+
+
 
 
 # Create your views here.
