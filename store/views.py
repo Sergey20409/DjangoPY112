@@ -27,9 +27,6 @@ def products_view(request):
         return JsonResponse(data, json_dumps_params={'ensure_ascii': False,
                                                      'indent': 4})
 
-
-
-
 # Create your views here.
 from django.http import HttpResponse
 
@@ -73,3 +70,36 @@ def products_page_view(request, page):
                 # TODO 3. Верните HttpResponse c содержимым html файла
 
         return HttpResponse(status=404)
+
+from logic.services import view_in_cart, add_to_cart, remove_from_cart
+
+
+def cart_view(request):
+    if request.method == "GET":
+        data = view_in_cart()  # TODO Вызвать ответственную за это действие функцию
+        return JsonResponse(data, json_dumps_params={'ensure_ascii': False,
+                                                     'indent': 4})
+
+
+def cart_add_view(request, id_product):
+    if request.method == "GET":
+        result = add_to_cart(id_product) # TODO Вызвать ответственную за это действие функцию и передать необходимые параметры
+        if result:
+            return JsonResponse({"answer": "Продукт успешно добавлен в корзину"},
+                                json_dumps_params={'ensure_ascii': False})
+
+        return JsonResponse({"answer": "Неудачное добавление в корзину"},
+                            status=404,
+                            json_dumps_params={'ensure_ascii': False})
+
+
+def cart_del_view(request, id_product):
+    if request.method == "GET":
+        result = remove_from_cart(id_product) # TODO Вызвать ответственную за это действие функцию и передать необходимые параметры
+        if result:
+            return JsonResponse({"answer": "Продукт успешно удалён из корзины"},
+                                json_dumps_params={'ensure_ascii': False})
+
+        return JsonResponse({"answer": "Неудачное удаление из корзины"},
+                            status=404,
+                            json_dumps_params={'ensure_ascii': False})
