@@ -124,6 +124,12 @@ def coupon_check_view(request, name_coupon):
             "is_valid": False},
     }
     if request.method == "GET":
+        if name_coupon in DATA_COUPON.keys():
+            return JsonResponse({"discount": DATA_COUPON[name_coupon]["value"], "is_valid":DATA_COUPON[name_coupon]["is valid"]},
+                                json_dumps_params={'ensure_ascii': False})
+        else:
+            return HttpResponseNotFound("Неверный купон")
+
 
         # TODO Проверьте, что купон есть в DATA_COUPON, если он есть, то верните JsonResponse в котором по ключу "discount"
         # получают значение скидки в процентах, а по ключу "is_valid" понимают действителен ли купон или нет (True, False)
