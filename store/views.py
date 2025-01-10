@@ -32,9 +32,9 @@ from django.http import HttpResponse
 
 def shop_view(request):
     if request.method == "GET":
-        with open('store/shop.html', encoding="utf-8") as f:
-            data = f.read()  # Читаем HTML файл
-        return HttpResponse(data)  # Отправляем HTML файл как ответ
+        return render(request,
+                      'store/shop.html',
+                      context={"products": DATABASE.values()})
 
 def products_page_view(request, page):
     if request.method == "GET":
@@ -76,9 +76,17 @@ from logic.services import view_in_cart, add_to_cart, remove_from_cart
 
 def cart_view(request):
     if request.method == "GET":
-        data = view_in_cart()  # TODO Вызвать ответственную за это действие функцию
-        return JsonResponse(data, json_dumps_params={'ensure_ascii': False,
-                                                     'indent': 4})
+        data = view_in_cart()
+        if request.GET.get('format') == 'JSON':
+            return JsonResponse(data, json_dumps_params={'ensure_ascii': False,
+                                                         'indent': 4})
+        products = []  # Список продуктов
+        for product_id, quantity in data['products'].items():
+            product = DATABASE[product_id]
+            product['quantity'] = quantity
+            product["price_total"] = f"{quantity * product['price_after']:.2f}"
+            products.append(product)
+        return render(request, "store/cart.html", context={"products": products})
 
 
 def cart_add_view(request, id_product):
