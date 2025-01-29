@@ -49,7 +49,7 @@ def wishlist_json(request):
 
     if request.method == "GET":
         current_user = get_user(request).username  # from django.contrib.auth import get_user
-        data = view_in_wishlist(current_user) # TODO получите данные о списке товаров в избранном у пользователя
+        data = view_in_wishlist(request).get(current_user) # TODO получите данные о списке товаров в избранном у пользователя
         if data:
             return JsonResponse(data, json_dumps_params={'ensure_ascii': False})
 

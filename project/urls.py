@@ -22,5 +22,5 @@ urlpatterns = [
     path('', include('app_weather.urls')),
     path('', include('store.urls')),
     path('login/', include('app_login.urls')),
-    path('', include('wishlist.urls')),
+    path('wishlist.html', include('wishlist.urls')),
 ]
